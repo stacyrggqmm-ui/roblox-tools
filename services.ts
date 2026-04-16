@@ -1,38 +1,32 @@
-export interface PlayerData {
-    id: string;
-    name: string;
-    score: number;
+import { HttpService } from '@rbxts/services';
+
+export interface RobloxDataResponse<T> {
+    success: boolean;
+    data?: T;
+    error?: string;
 }
 
-export interface GameService {
-    getPlayerData(playerId: string): PlayerData | null;
-    updatePlayerScore(playerId: string, score: number): void;
+export function fetchRobloxData<T>(url: string): Promise<RobloxDataResponse<T>> {
+    return new Promise((resolve) => {
+        HttpService.GetAsync(url)
+            .then((response) => {
+                const data = JSON.parse(response);
+                resolve({ success: true, data });
+            })
+            .catch((error) => {
+                resolve({ success: false, error: error.message });
+            });
+    });
 }
 
-class RobloxGameService implements GameService {
-    private playerDatabase: Record<string, PlayerData> = {};
-
-    public getPlayerData(playerId: string): PlayerData | null {
-        return this.playerDatabase[playerId] || null;
-    }
-
-    public updatePlayerScore(playerId: string, score: number): void {
-        const player = this.getPlayerData(playerId);
-        if (player) {
-            player.score += score;
-        }
-    }
-
-    public addPlayer(player: PlayerData): void {
-        this.playerDatabase[player.id] = player;
-    }
+export function postRobloxData<T>(url: string, body: T): Promise<RobloxDataResponse<void>> {
+    return new Promise((resolve) => {
+        HttpService.PostAsync(url, JSON.stringify(body), Enum.HttpContentType.ApplicationJson)
+            .then(() => {
+                resolve({ success: true });
+            })
+            .catch((error) => {
+                resolve({ success: false, error: error.message });
+            });
+    });
 }
-
-const gameService = new RobloxGameService();
-const player: PlayerData = { id: '1', name: 'PlayerOne', score: 0 };
-
-gameService.addPlayer(player);
-// Example usage: updating score
-console.log(gameService.getPlayerData('1'));  // { id: '1', name: 'PlayerOne', score: 0 }
-gameService.updatePlayerScore('1', 10);
-console.log(gameService.getPlayerData('1'));  // { id: '1', name: 'PlayerOne', score: 10 }
