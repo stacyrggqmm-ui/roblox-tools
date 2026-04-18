@@ -1,23 +1,19 @@
-function isValidInput(input: any): boolean {
-    return typeof input === 'string' && input.trim() !== '';
-}
-
-function processInput(input: string): void {
-    if (!isValidInput(input)) {
-        throw new Error('Invalid input: input must be a non-empty string.');
-    }
-    console.log(`Processing input: ${input}`);
-}
-
-function main(inputs: string[]): void {
-    inputs.forEach(input => {
+export async function retry<T>(fn: () => Promise<T>, retries: number, delay: number): Promise<T> {
+    for (let i = 0; i < retries; i++) {
         try {
-            processInput(input);
+            return await fn();
         } catch (error) {
-            console.error(error.message);
+            if (i === retries - 1) throw error;
+            await new Promise(res => setTimeout(res, delay));
         }
-    });
+    }
+    throw new Error('Max retries reached');
 }
 
-const inputs = ['hello', '', 'world', null, '  '];
-main(inputs);
+export async function fetchData(url: string): Promise<any> {
+    return await retry(async () => {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+    }, 3, 1000);
+}
