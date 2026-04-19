@@ -1,40 +1,36 @@
-export function debounce<F extends (...args: any[]) => void>(func: F, delay: number): (...args: Parameters<F>) => void {
-    let timeoutId: ReturnType<typeof setTimeout> | null;
-
-    return (...args: Parameters<F>): void => {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
+export function safeGet<T>(obj: Record<string, any>, key: string): T | undefined {
+    try {
+        if (obj && key in obj) {
+            return obj[key];
         }
-        timeoutId = setTimeout(() => func(...args), delay);
-    };
+    } catch (error) {
+        console.error('Error in safeGet:', error);
+    }
+    return undefined;
 }
 
-export function throttle<F extends (...args: any[]) => void>(func: F, limit: number): (...args: Parameters<F>) => void {
-    let lastFunc: ReturnType<typeof setTimeout> | null;
-    let lastRan: number;
-
-    return function (...args: Parameters<F>): void {
-        const context = this;
-        if (!lastRan) {
-            func.apply(context, args);
-            lastRan = Date.now();
-        } else {
-            if (Date.now() - lastRan >= limit) {
-                func.apply(context, args);
-                lastRan = Date.now();
-            }
-        }
-    };
+export function parseNumber(value: any): number | null {
+    try {
+        const parsed = Number(value);
+        return isNaN(parsed) ? null : parsed;
+    } catch (error) {
+        console.error('Error in parseNumber:', error);
+        return null;
+    }
 }
 
-export function formatDate(date: Date, format: string): string {
-    const options: Intl.DateTimeFormatOptions = {};
-    if (format.includes('year')) options.year = 'numeric';
-    if (format.includes('month')) options.month = '2-digit';
-    if (format.includes('day')) options.day = '2-digit';
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+export function validatePositiveNumber(value: any): boolean {
+    try {
+        const num = parseNumber(value);
+        return num !== null && num > 0;
+    } catch (error) {
+        console.error('Error in validatePositiveNumber:', error);
+        return false;
+    }
 }
 
-export function randomInteger(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+export function logError(message: string, error?: Error): void {
+    const timestamp = new Date().toISOString();
+    const errorMessage = error ? `: ${error.message}` : '';
+    console.error(`[${timestamp}] ${message}${errorMessage}`);
 }
