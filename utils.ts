@@ -1,36 +1,19 @@
-export function safeGet<T>(obj: Record<string, any>, key: string): T | undefined {
+export async function retry<T>(
+  fn: () => Promise<T>,
+  retries: number = 3,
+  delay: number = 1000
+): Promise<T> {
+  for (let attempt = 0; attempt < retries; attempt++) {
     try {
-        if (obj && key in obj) {
-            return obj[key];
-        }
+      return await fn();
     } catch (error) {
-        console.error('Error in safeGet:', error);
+      if (attempt === retries - 1) throw error;
+      await new Promise(res => setTimeout(res, delay));
     }
-    return undefined;
+  }
+  throw new Error('Failed after maximum retries');
 }
 
-export function parseNumber(value: any): number | null {
-    try {
-        const parsed = Number(value);
-        return isNaN(parsed) ? null : parsed;
-    } catch (error) {
-        console.error('Error in parseNumber:', error);
-        return null;
-    }
-}
-
-export function validatePositiveNumber(value: any): boolean {
-    try {
-        const num = parseNumber(value);
-        return num !== null && num > 0;
-    } catch (error) {
-        console.error('Error in validatePositiveNumber:', error);
-        return false;
-    }
-}
-
-export function logError(message: string, error?: Error): void {
-    const timestamp = new Date().toISOString();
-    const errorMessage = error ? `: ${error.message}` : '';
-    console.error(`[${timestamp}] ${message}${errorMessage}`);
+export async function fetchWithRetry(url: string, options?: RequestInit): Promise<Response> {
+  return retry(() => fetch(url, options), 3, 1000);
 }
