@@ -1,32 +1,29 @@
-import { HttpService } from '@rbxts/services';
+import { HttpService } from 'services/http'; 
+import { User } from 'types'; 
 
-export interface RobloxDataResponse<T> {
-    success: boolean;
-    data?: T;
-    error?: string;
-}
+export class UserService { 
+    private httpService: HttpService; 
 
-export function fetchRobloxData<T>(url: string): Promise<RobloxDataResponse<T>> {
-    return new Promise((resolve) => {
-        HttpService.GetAsync(url)
-            .then((response) => {
-                const data = JSON.parse(response);
-                resolve({ success: true, data });
-            })
-            .catch((error) => {
-                resolve({ success: false, error: error.message });
-            });
-    });
-}
+    constructor(httpService: HttpService) { 
+        this.httpService = httpService; 
+    } 
 
-export function postRobloxData<T>(url: string, body: T): Promise<RobloxDataResponse<void>> {
-    return new Promise((resolve) => {
-        HttpService.PostAsync(url, JSON.stringify(body), Enum.HttpContentType.ApplicationJson)
-            .then(() => {
-                resolve({ success: true });
-            })
-            .catch((error) => {
-                resolve({ success: false, error: error.message });
-            });
-    });
+    async getUserById(userId: string): Promise<User> { 
+        const response = await this.httpService.get(`/users/${userId}`); 
+        return response.data as User; 
+    } 
+
+    async createUser(user: User): Promise<User> { 
+        const response = await this.httpService.post('/users', user); 
+        return response.data as User; 
+    } 
+
+    async updateUser(userId: string, user: Partial<User>): Promise<User> { 
+        const response = await this.httpService.put(`/users/${userId}`, user); 
+        return response.data as User; 
+    } 
+
+    async deleteUser(userId: string): Promise<void> { 
+        await this.httpService.delete(`/users/${userId}`); 
+    } 
 }
