@@ -1,19 +1,15 @@
-export async function retry<T>(
-  fn: () => Promise<T>,
-  retries: number = 3,
-  delay: number = 1000
-): Promise<T> {
-  for (let attempt = 0; attempt < retries; attempt++) {
+export async function retry<T>(fn: () => Promise<T>, retries: number = 3, delay: number = 1000): Promise<T> {
     try {
-      return await fn();
+        return await fn();
     } catch (error) {
-      if (attempt === retries - 1) throw error;
-      await new Promise(res => setTimeout(res, delay));
+        if (retries > 0) {
+            await new Promise(res => setTimeout(res, delay));
+            return retry(fn, retries - 1, delay);
+        }
+        throw error;
     }
-  }
-  throw new Error('Failed after maximum retries');
 }
 
-export async function fetchWithRetry(url: string, options?: RequestInit): Promise<Response> {
-  return retry(() => fetch(url, options), 3, 1000);
+export function isNetworkError(error: any): boolean {
+    return error && error instanceof Error && /Network Error/i.test(error.message);
 }
