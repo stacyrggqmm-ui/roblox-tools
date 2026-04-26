@@ -1,29 +1,37 @@
-import { HttpService } from 'services/http'; 
-import { User } from 'types'; 
+type User = {
+    id: string;
+    name: string;
+    age: number;
+};
 
-export class UserService { 
-    private httpService: HttpService; 
+class UserService {
+    private users: User[] = [];
 
-    constructor(httpService: HttpService) { 
-        this.httpService = httpService; 
-    } 
+    /**
+     * Adds a user to the service.
+     * @param user - The user to add.
+     */
+    public addUser(user: User): void {
+        this.users.push(user);
+    }
 
-    async getUserById(userId: string): Promise<User> { 
-        const response = await this.httpService.get(`/users/${userId}`); 
-        return response.data as User; 
-    } 
+    /**
+     * Retrieves all users from the service.
+     * @returns An array of users.
+     */
+    public getUsers(): User[] {
+        return this.users;
+    }
 
-    async createUser(user: User): Promise<User> { 
-        const response = await this.httpService.post('/users', user); 
-        return response.data as User; 
-    } 
-
-    async updateUser(userId: string, user: Partial<User>): Promise<User> { 
-        const response = await this.httpService.put(`/users/${userId}`, user); 
-        return response.data as User; 
-    } 
-
-    async deleteUser(userId: string): Promise<void> { 
-        await this.httpService.delete(`/users/${userId}`); 
-    } 
+    /**
+     * Finds a user by ID.
+     * @param id - The ID of the user to find.
+     * @returns The user if found, otherwise undefined.
+     */
+    public findUserById(id: string): User | undefined {
+        return this.users.find(user => user.id === id);
+    }
 }
+
+const userService = new UserService();
+export default userService;
