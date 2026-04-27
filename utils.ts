@@ -1,15 +1,14 @@
-export async function retry<T>(fn: () => Promise<T>, retries: number = 3, delay: number = 1000): Promise<T> {
-    try {
-        return await fn();
-    } catch (error) {
-        if (retries > 0) {
-            await new Promise(res => setTimeout(res, delay));
-            return retry(fn, retries - 1, delay);
-        }
-        throw error;
-    }
-}
+type RobloxData = {id: number; name: string; description: string; creator: string; createdAt: string; updatedAt: string;};
 
-export function isNetworkError(error: any): boolean {
-    return error && error instanceof Error && /Network Error/i.test(error.message);
-}
+const fetchRobloxData = async (id: number): Promise<RobloxData> => {
+    const response = await fetch(`https://api.roblox.com/data/${id}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    const data: RobloxData = await response.json();
+    return data;
+};
+
+const formatRobloxData = (data: RobloxData): string => {
+    return `(${data.id}) ${data.name} - ${data.description} \nCreated by: ${data.creator} on ${data.createdAt}`;
+};
+
+export { fetchRobloxData, formatRobloxData };
