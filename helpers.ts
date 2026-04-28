@@ -1,19 +1,38 @@
-export async function retry<T>(fn: () => Promise<T>, retries: number, delay: number): Promise<T> {
-    for (let i = 0; i < retries; i++) {
-        try {
-            return await fn();
-        } catch (error) {
-            if (i === retries - 1) throw error;
-            await new Promise(res => setTimeout(res, delay));
-        }
-    }
-    throw new Error('Max retries reached');
+export function formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
 }
 
-export async function fetchData(url: string): Promise<any> {
-    return await retry(async () => {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Network response was not ok');
-        return await response.json();
-    }, 3, 1000);
+export function generateUniqueId(): string {
+    return 'id-' + Math.random().toString(36).substr(2, 9);
+}
+
+export function debounce(fn: Function, delay: number): () => void {
+    let timeoutId: NodeJS.Timeout;
+    return function(...args: any[]) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
+}
+
+export function throttle(fn: Function, limit: number): () => void {
+    let lastFn: NodeJS.Timeout;
+    let lastRan: number;
+    return function(...args: any[]) {
+        const context = this;
+        if (!lastRan) {
+            fn.apply(context, args);
+            lastRan = Date.now();
+        }
+        clearTimeout(lastFn);
+        lastFn = setTimeout(() => {
+            if ((Date.now() - lastRan) >= limit) {
+                fn.apply(context, args);
+                lastRan = Date.now();
+            }
+        }, limit - (Date.now() - lastRan));
+    };
+}
+
+export function isEmptyObject(obj: object): boolean {
+    return Object.keys(obj).length === 0;
 }
