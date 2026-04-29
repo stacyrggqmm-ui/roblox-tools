@@ -1,25 +1,25 @@
 # roblox-tools
 
-A comprehensive toolkit designed to enhance your Roblox development experience using TypeScript. This library provides a suite of utilities to streamline game development and improve workflow efficiency.
+A comprehensive toolkit for Roblox developers built using TypeScript. This library aims to simplify the development process by providing easy-to-use utilities and extensions specifically designed for the Roblox platform. 
 
 ## Features
 
-- **Type Safety**: Leverage TypeScript's robust type system for safer coding and fewer runtime errors.
-- **Extended API Functions**: Access extended functionality for common game mechanics, including improved event handling and data management.
-- **Asset Management**: Easily handle Roblox assets with functions to download, upload, and manage asset properties programmatically.
-- **Debugging Utilities**: Built-in logging and debugging features to help track down issues quickly, enhancing the development process.
+- **Player Management**: Easily fetch and manage player data, including inventory, badges, and game stats.
+- **Asset Loader**: Streamline the process of loading and managing Roblox assets such as images, models, and audio files.
+- **Extended Tweening**: Enhanced tweening functions to create smooth animations with customizable easing options.
+- **Event System**: A flexible event handling system to facilitate communication between different components in your game.
 
 ## Installation
 
-To get started with `roblox-tools`, clone the repository and install the dependencies. Make sure you have Node.js and npm installed.
+To get started with `roblox-tools`, clone the repository or install it via npm:
 
 ```bash
-git clone https://github.com/yourusername/roblox-tools.git
+git clone https://github.com/YourUsername/roblox-tools.git
 cd roblox-tools
 npm install
 ```
 
-Alternatively, you can install it directly via npm:
+Additionally, if you prefer to use npm:
 
 ```bash
 npm install roblox-tools
@@ -27,23 +27,19 @@ npm install roblox-tools
 
 ## Basic Usage
 
-Once installed, you can use the toolkit in your TypeScript project. Here's a simple example of how to log a message and retrieve a player's data:
+Here’s a quick example demonstrating how to use the `PlayerManager` feature to get player statistics:
 
 ```typescript
-import { PlayerUtils, Logger } from 'roblox-tools';
+import { PlayerManager } from 'roblox-tools';
 
-// Logging a message
-Logger.info('Initializing Roblox tools...');
-
-// Fetch player data
-const playerData = PlayerUtils.getPlayerData('PlayerName');
-console.log(`Player Name: ${playerData.name}, Score: ${playerData.score}`);
+const playerStats = PlayerManager.getPlayerStats(playerId);
+console.log(`Player's K/D Ratio: ${playerStats.kdRatio}`);
 ```
 
-This example illustrates just a fraction of the capabilities offered by `roblox-tools`. Explore the documentation for more advanced features and detailed usage instructions.
+This simple code snippet initializes the `PlayerManager` from the library to fetch and display a player's kill/death ratio, showcasing the utility of the toolkit in enhancing your Roblox games.
 
 ## License
 
-![MIT License](https://img.shields.io/badge/License-MIT-green.svg) 
+![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
