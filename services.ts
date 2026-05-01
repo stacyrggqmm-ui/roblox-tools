@@ -1,37 +1,42 @@
-type User = {
-    id: string;
-    name: string;
-    age: number;
-};
+import { HttpService } from "@rbxts/services";
 
-class UserService {
-    private users: User[] = [];
-
-    /**
-     * Adds a user to the service.
-     * @param user - The user to add.
-     */
-    public addUser(user: User): void {
-        this.users.push(user);
-    }
-
-    /**
-     * Retrieves all users from the service.
-     * @returns An array of users.
-     */
-    public getUsers(): User[] {
-        return this.users;
-    }
-
-    /**
-     * Finds a user by ID.
-     * @param id - The ID of the user to find.
-     * @returns The user if found, otherwise undefined.
-     */
-    public findUserById(id: string): User | undefined {
-        return this.users.find(user => user.id === id);
-    }
+interface ApiResponse<T> {
+    data: T;
+    error?: string;
 }
 
-const userService = new UserService();
-export default userService;
+export class ApiService {
+    private baseUrl: string;
+
+    constructor(baseUrl: string) {
+        this.baseUrl = baseUrl;
+    }
+
+    public async fetchData<T>(endpoint: string): Promise<ApiResponse<T>> {
+        try {
+            const response = await HttpService.GetAsync(`${this.baseUrl}/${endpoint}`);
+            const data: T = JSON.parse(response);
+            return { data };
+        } catch (error) {
+            let errorMessage = "Unknown error";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            return { data: null as any, error: errorMessage };
+        }
+    }
+
+    public async postData<T>(endpoint: string, payload: T): Promise<ApiResponse<T>> {
+        try {
+            const response = await HttpService.PostAsync(`${this.baseUrl}/${endpoint}`, JSON.stringify(payload));
+            const data: T = JSON.parse(response);
+            return { data };
+        } catch (error) {
+            let errorMessage = "Unknown error";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            return { data: null as any, error: errorMessage };
+        }
+    }
+}
